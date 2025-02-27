@@ -1,25 +1,43 @@
-import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Text, Button } from 'react-native-paper';
 import { useLocalSearchParams, router } from 'expo-router';
+import { WebView } from 'react-native-webview';
 
 export default function BookSuccessScreen() {
   const { scanningResult } = useLocalSearchParams<{ scanningResult: string }>();
 
+  const handleBackButtonPress = () => {
+    router.push('/book-room-screen');
+  };
+
   return (
     <View style={styles.container}>
-      {/* Booking Success Message */}
-      <Text style={styles.message}>Booking Success!</Text>
+      {/* WebView to display the booking results */}
+      <View style={styles.webviewContainer}>
+        <WebView
+          originWhitelist={['*']} 
+          source={{ uri: scanningResult }} // Open the URL from the QR code
+          style={styles.webview}
+          onError={(syntheticEvent) => {
+            const { nativeEvent } = syntheticEvent;
+            console.error('WebView Error:', nativeEvent);
+          }}
+          onHttpError={(syntheticEvent) => {
+            const { nativeEvent } = syntheticEvent;
+            console.error('HTTP Error:', nativeEvent.statusCode);
+          }}
+        />
+      </View>
 
       {/* QR Code Data */}
       <View style={styles.qrDataContainer}>
-        <Text style={styles.data}>QR Code Data:</Text>
-        <Text style={styles.data}>{scanningResult}</Text>
+        <Text>QR Code Data:</Text>
+        <Text>{scanningResult}</Text>
       </View>
 
-      {/* Optional Button for going back or doing something further */}
-      <Button mode="contained" onPress={() => router.push('/book-room-screen')} style={styles.button}>
-        Go Back
+      {/* Back Button */}
+      <Button mode="contained" onPress={handleBackButtonPress} style={styles.button}>
+        Go Back to Room Listing
       </Button>
     </View>
   );
@@ -37,20 +55,26 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: 'green',
     textAlign: 'center',
-    marginTop: '40%',
+    marginTop: '10%',
   },
   qrDataContainer: {
     alignItems: 'center', 
     marginVertical: 20,
   },
-  data: {
-    fontSize: 18,
-    textAlign: 'center',
+  webview: {
+    zIndex: 9,
+    flex: 1,
+    width: '100%',
+    marginVertical: 10,
+  },
+  webviewContainer: {
+    flex: 1,
+    alignSelf: 'stretch',
   },
   button: {
     width: '95%',
     paddingVertical: 15,
     marginTop: 'auto',
-    marginBottom: 10
+    marginBottom: 10,
   },
 });
