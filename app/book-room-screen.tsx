@@ -20,6 +20,7 @@ import { Room, RoomAvailability, TimeSlot } from '../types/Room';
 
 const RoomListingScreen = () => {
   const [rooms, setRooms] = useState<Room[]>([]);
+  const [sortedRooms, setSortedRooms] = useState<Room[]>([]);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<TimeSlot>("08:00");
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -48,11 +49,19 @@ const RoomListingScreen = () => {
     return () => backHandler.remove();
   }, []);
 
+  // UpdateRooms when sortBy or TimeSlot changes
+  useEffect(() => {
+    const sortedRooms = sortRooms(rooms);
+    setSortedRooms(sortedRooms);
+  }, [sortBy, selectedTimeSlot]);
+
   const loadRooms = async () => {
     setLoading(true);
     try {
       const data = await fetchRooms(selectedDate);
       setRooms(data);
+      const sortedRooms = sortRooms(data);
+      setSortedRooms(sortedRooms);
     } catch (error) {
       console.error('Failed to load rooms:', error);
     } finally {
@@ -65,7 +74,7 @@ const RoomListingScreen = () => {
       case 'level':
         return [...rooms].sort((a, b) => parseInt(a.level) - parseInt(b.level));
       case 'capacity':
-        return [...rooms].sort((a, b) => parseInt(a.capacity) - parseInt(b.capacity));
+        return [...rooms].sort((a, b) => parseInt(b.capacity) - parseInt(a.capacity));
       case 'availability':
         return [...rooms].sort((a, b) => 
           (b.availability[selectedTimeSlot] === "1" ? 1 : 0) - 
@@ -86,11 +95,16 @@ const RoomListingScreen = () => {
   };
 
   const renderRoom = ({ item }: { item: Room }) => (
-    <Card style={{ margin: 8, backgroundColor: '#f5f5f5' }}>
+    <Card style={{ margin: 8, backgroundColor: '#f6f6f6' }}>
     <Card.Content>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
         <Title>{item.name}</Title>
-        <Text style={{ fontStyle: 'italic' }}>
+        <Text 
+          style={{
+            fontStyle: 'italic',
+            color: item.availability[selectedTimeSlot] === "1" ? 'green' : 'red', // Green for available, red for occupied
+          }}
+        >
           {item.availability[selectedTimeSlot] === "1" ? 'Available' : 'Occupied'}
         </Text>
       </View>
@@ -105,7 +119,7 @@ const RoomListingScreen = () => {
 
   return (
     <View style={styles.container}>
-      /* Header */
+      {/* Header */}
       <View style={styles.header}>
         <View style={styles.titleContainer}>
           <Title>Book a Room</Title>
@@ -116,7 +130,7 @@ const RoomListingScreen = () => {
         />
       </View>
       
-      /* Date Picker */
+      {/* Date Picker */}
       <View style={{ marginBottom: 16 }}>
         <Button 
           mode="outlined" 
@@ -137,7 +151,7 @@ const RoomListingScreen = () => {
           />
         )}
 
-        /* Time Slot Picker */
+        {/* Time Slot Picker */}
         <View style={{ marginTop: 8 }}>
           <Dropdown
             label="Select Time Slot"
@@ -149,8 +163,8 @@ const RoomListingScreen = () => {
         </View>
       </View>
 
-      /* Rooms +  Sort Button */
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+      {/* Rooms +  Sort Button */}
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
         <Title> Rooms</Title>
         <IconButton
           icon="sort"
@@ -158,19 +172,20 @@ const RoomListingScreen = () => {
         />
       </View>
 
-      /* FlatList of Rooms */
+      {/* FlatList of Rooms */}
       {loading ? (
         <ActivityIndicator size="large" style={{ flex: 1 }} />
       ) : (
         <FlatList
-          data={rooms}
+          data={sortedRooms}
+          extraData={sortedRooms}
           renderItem={renderRoom}
           keyExtractor={item => item.name}
           contentContainerStyle={{ paddingBottom: 16 }}
         />
       )}
 
-      /* Sort Modal */
+      {/* Sort Modal */}
       <Portal>
         <Modal
           visible={sortModalVisible}
@@ -217,6 +232,9 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  modal: {
+    backgroundColor: 'white',
   },
 });
 
