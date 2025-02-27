@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
+import { CameraView, CameraType, useCameraPermissions, BarcodeScanningResult } from 'expo-camera';
+import { router } from 'expo-router';
 import { Button, StyleSheet, Text, TouchableOpacity, View, BackHandler } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { IconButton } from 'react-native-paper';
@@ -11,34 +12,23 @@ export default function QRScannerScreen() {
 
   useEffect(() => {
     if (permission && !permission.granted) {
-      // Automatically request permission if not granted
+      // Request permission if not granted
       requestPermission();
     }
   }, [permission]);
 
-  useEffect(() => {
-    // Handle Android hardware back press
-    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
-      navigation.goBack(); // Go back to the previous screen
-      return true; // Prevent default behavior
-    });
-  });
-
-
   if (!permission) {
-    // Camera permissions are still loading
     return <View />;
-  }
+  };
 
   if (!permission.granted) {
-    // Camera permissions are not granted
     return (
       <View style={styles.container}>
         <Text style={styles.message}>We need your permission to show the camera</Text>
         <Button onPress={requestPermission} title="Grant Permission" />
       </View>
     );
-  }
+  };
 
   const toggleCameraFacing = () => {
     setFacing(current => (current === 'back' ? 'front' : 'back'));
@@ -57,7 +47,11 @@ export default function QRScannerScreen() {
       />
       <Text style={styles.title}>Scan a QR Code</Text>
       
-      <CameraView style={styles.camera} facing={facing}>
+      <CameraView 
+        style={styles.camera} 
+        facing={facing} 
+        onBarcodeScanned={(scanningResult : BarcodeScanningResult) => router.push({pathname: '/book-success-screen', params: { scanningResult: scanningResult.data }})}
+        >
         <View style={styles.buttonContainer}>
           <TouchableOpacity style={styles.button} onPress={toggleCameraFacing}>
             <Text style={styles.text}>Flip Camera</Text>
