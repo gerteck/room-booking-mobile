@@ -39,16 +39,14 @@ export default function RootLayout() {
           name="book-room-screen"
           options={{
             title: "Book a Room",
-            headerBackVisible: false,
-            headerRight: () => (
-              <Stack.Screen
-                name="qr-scanner-screen"
-                options={{
-                  presentation: 'modal',
-                  headerShown: false,
-                }}
-              />
-            ),
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="qr-scanner-screen"
+          options={{
+            presentation: 'modal',
+            headerShown: false,
           }}
         />
         <Stack.Screen
