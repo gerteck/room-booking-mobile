@@ -13,12 +13,20 @@ This app aims to demonstrate the following:
 
 [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
 
+Pre-requisites: Have some recent version of Node.js installed, Install Expo Go on a physical device (if want to test physically.) 
 
 1. Install dependencies: `npm install`
-2. Start app: `npx expo start`
-3. To view in 'app view', visit localhost:8081 and toggle device toolbar.
+1. Start app: `npx expo start`
+1. To view in 'app view' on a web browser, visit localhost:8081 and toggle device toolbar.
+1. To run on android emulator, Press `a`.
 
-### Project Structure
+To run tests, run:
+
+1. `npm test`
+
+### Other stuff.
+
+#### Project Structure
 
 ```
 /room-booking-mobile
@@ -30,9 +38,15 @@ This app aims to demonstrate the following:
 │── tsconfig.json       # TypeScript config
 ```
 
+#### Assumptions & Interpretations
+- Navigation between screens will be handled using `expo-router`.
+- Error handling will be implemented for cases like camera permissions not being granted or scanning failures.
+- The UI will be designed with React Native Paper to maintain consistency with Material Design principles.
+
+Flow of Application: 
+![screenFlow](./screenFlow.jpg)
 
 **Others:**
 
 Project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
 * Use [https://imagecolorpicker.com/](https://imagecolorpicker.com/) to get color from figma to the app.
