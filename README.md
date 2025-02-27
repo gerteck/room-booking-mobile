@@ -35,5 +35,4 @@ This app aims to demonstrate the following:
 
 Project uses [file-based routing](https://docs.expo.dev/router/introduction).
 
-Note: Expo Router is a file based router for React Native + Web apps. 
-* When file added to `\app` directory, auto becommes route in navigation.
+* Use [https://imagecolorpicker.com/](https://imagecolorpicker.com/) to get color from figma to the app.
